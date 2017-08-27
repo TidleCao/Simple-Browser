@@ -11,11 +11,17 @@ import WebKit
 
 class ViewController: NSViewController {
     
-    @IBOutlet weak var contentView: NSView!
-    @IBOutlet weak var searchField: NSTextField!
-    
     var tabViewController: TabViewController! = TabViewController(nibName: "TabViewController", bundle: Bundle.main)
+
+    @IBOutlet weak var forwardBtn: NSButton!
+    @IBOutlet weak var backwardBtn: NSButton!
     
+    @IBOutlet weak var contentView: NSView!
+    @IBOutlet weak var searchField: NSSearchField! {
+        didSet {
+            searchField.sendsWholeSearchString = true
+        }
+    }
     
     
     @IBAction func search(_ sender: Any) {
@@ -93,6 +99,15 @@ extension ViewController: WebUIDelegate {
 // MARK: -
 
 extension ViewController: TabViewDelegate {
+    
+    func tabItemSelectionWillChange(_ tabViewController: TabViewController) {
+        
+        // unbind forward/backward button status
+        self.backwardBtn?.unbind("enabled")
+        self.backwardBtn?.unbind("enabled")
+        
+    }
+
     func tabItemSelectionDidChange(_ tabViewController: TabViewController) {
         
         let selectedItem = tabViewController.selectedItem
@@ -101,13 +116,21 @@ extension ViewController: TabViewDelegate {
             self.newWebViewController(with: nil)
             self.searchField.stringValue = ""
 
-            
         }else {
+            guard let vc = selectedItem!.viewController as? WebViewController else {
+                return
+            }
             
             //update searching field
-            if let url  = (selectedItem!.viewController as! WebViewController).webView.url?.absoluteString {
+            if let url  = vc.webView.url?.absoluteString {
                 self.searchField.stringValue = url
             }
+            
+
+            // bind forward/backward button status
+            self.backwardBtn?.bind("enabled", to: vc.webView, withKeyPath: "canGoBack", options: nil)
+            self.forwardBtn?.bind("enabled", to: vc.webView, withKeyPath: "canGoForward", options: nil)
+
         }
 
     }

@@ -21,14 +21,22 @@ fileprivate let addItemSpaceWidth: CGFloat = 80
 protocol TabViewDelegate {
     
     func tabItemSelectionDidChange(_ tabViewController: TabViewController)
-    
+    func tabItemSelectionWillChange(_ tabViewController: TabViewController)
+
 }
 
 class TabViewController: NSViewController {
     
     var selectedItem: TabItem?
     var delegate: TabViewDelegate?
+    var tabViewItems: [TabItem] = []
     
+    var selectedTabViewItemIndex: Int {
+        if nil != selectedItem {
+            return tabViewItems.index(of: selectedItem!) ?? -1
+        }
+        return -1
+    }
     
     @IBOutlet weak var contentView: NSView! {
         didSet {
@@ -44,7 +52,7 @@ class TabViewController: NSViewController {
         }
     }
     
-    var tabItemWidth: CGFloat {
+    fileprivate var tabItemWidth: CGFloat {
         let width = (tabView.frame.size.width - addItemSpaceWidth) / CGFloat(tabViewItems.count)
         
         if width <= tabItemWidthMin {
@@ -55,11 +63,7 @@ class TabViewController: NSViewController {
         return width
     }
     
-    var tabViewItems: [TabItem] = []
-    var selectedTabViewItemIndex: Int = 0
-    
-    
-    func drawTab() {
+    fileprivate func drawTab() {
         
         var startx: CGFloat = 10.0
         let width = tabItemWidth
@@ -70,31 +74,34 @@ class TabViewController: NSViewController {
         }
     }
     
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        // Do view setup here.
-    }
-    
     func select(for item: TabItem) {
         guard tabViewItems.contains(item), selectedItem != item else {
             return
         }
         
+        delegate?.tabItemSelectionWillChange(self)
+
         if selectedItem != nil {
+            
             selectedItem?.isSelected = false
             selectedItem?.viewController?.view.removeFromSuperview()
-        }
 
+        }
+        
+        selectedItem = item
+        item.isSelected = true
+        
         contentView.addSubview(item.viewController.view)
         item.viewController.view.frame = contentView.bounds
         item.viewController.view.autoresizingMask = [.viewHeightSizable, .viewMaxYMargin,.viewMinXMargin,.viewWidthSizable]
-        
-        item.isSelected = true
-        selectedItem = item
         delegate?.tabItemSelectionDidChange(self)
         
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        // Do view setup here.
     }
     
 }
