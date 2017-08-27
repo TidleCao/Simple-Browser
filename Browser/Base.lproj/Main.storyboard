@@ -720,6 +720,9 @@
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
+                                <connections>
+                                    <action selector="goback:" target="XfG-lQ-9wD" id="Ulb-UN-q8E"/>
+                                </connections>
                             </button>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="AXB-vQ-zoE">
                                 <rect key="frame" x="128" y="425" width="49" height="32"/>
@@ -728,13 +731,24 @@
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
+                                <connections>
+                                    <action selector="goForward:" target="XfG-lQ-9wD" id="4j9-EH-HAc"/>
+                                </connections>
                             </button>
+                            <progressIndicator wantsLayer="YES" fixedFrame="YES" maxValue="100" displayedWhenStopped="NO" controlSize="small" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="FDt-ZM-mmC">
+                                <rect key="frame" x="179" y="422" width="467" height="12"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <connections>
+                                    <binding destination="XfG-lQ-9wD" name="value" keyPath="self.progress" id="sbd-pg-leo"/>
+                                </connections>
+                            </progressIndicator>
                         </subviews>
                     </view>
                     <connections>
                         <outlet property="backwardBtn" destination="7gZ-vl-kr5" id="ggf-EU-qRF"/>
                         <outlet property="contentView" destination="rBx-LU-3ge" id="raP-8V-aDk"/>
                         <outlet property="forwardBtn" destination="AXB-vQ-zoE" id="yFb-Zg-ALs"/>
+                        <outlet property="progressIndicator" destination="FDt-ZM-mmC" id="P60-HA-PNg"/>
                         <outlet property="searchField" destination="gAI-QW-K2z" id="dH8-q4-1DR"/>
                     </connections>
                 </viewController>

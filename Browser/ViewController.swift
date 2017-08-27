@@ -12,7 +12,10 @@ import WebKit
 class ViewController: NSViewController {
     
     var tabViewController: TabViewController! = TabViewController(nibName: "TabViewController", bundle: Bundle.main)
-
+    
+   dynamic var progress: Double = 0
+    
+    @IBOutlet weak var progressIndicator: NSProgressIndicator!
     @IBOutlet weak var forwardBtn: NSButton!
     @IBOutlet weak var backwardBtn: NSButton!
     
@@ -23,9 +26,24 @@ class ViewController: NSViewController {
         }
     }
     
+    @IBAction func goForward(_ sender: Any) {
+        if let vc = tabViewController.selectedItem?.viewController as? WebViewController {
+            vc.webView.goForward()
+        }
+    }
     
+    @IBAction func goback(_ sender: Any) {
+        if let vc = tabViewController.selectedItem?.viewController as? WebViewController {
+            vc.webView.goBack()
+        }
+
+    }
     @IBAction func search(_ sender: Any) {
         var str = searchField.stringValue.trimmingCharacters(in: CharacterSet.whitespaces)
+        if str == "" {
+            (tabViewController.selectedItem?.viewController as? WebViewController)?.webView.stopLoading()
+            return
+        }
         if !str.hasPrefix("http") {
             str = "http://\(str)"
         }
@@ -94,6 +112,14 @@ extension ViewController: WebUIDelegate {
         tabViewController.item(for: vc)?.label = title
     }
     
+    func controller(_ vc: WebViewController, updateProgress estimatedProgress: Double) {
+        print("estimatedProgress: \(estimatedProgress)")
+        
+        self.progress = estimatedProgress  * 100
+        progressIndicator.isHidden = estimatedProgress == 1.0
+    }
+    
+
 }
 
 // MARK: -

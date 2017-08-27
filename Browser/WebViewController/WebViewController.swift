@@ -18,6 +18,7 @@ protocol WebUIDelegate {
     func controller(_ vc: WebViewController, didCommit navigation: WKNavigation!)
 
     func controller(_ vc: WebViewController,  didChangeTitle title: String)
+    func controller(_ vc: WebViewController,  updateProgress estimatedProgress: Double)
 
 }
 
@@ -34,12 +35,16 @@ class WebViewController: NSViewController {
             webView = WKWebView(frame: self.view.bounds)
         }
         
+        webView.configuration.preferences.setValue(true, forKey: "developerExtrasEnabled")
         self.view.addSubview(webView!)
         webView.setFrameSize(self.view.bounds.size)
         webView.autoresizingMask = [.viewHeightSizable, .viewMaxYMargin,.viewMinXMargin,.viewWidthSizable]
         webView.uiDelegate = self
         webView.navigationDelegate = self
         webView.addObserver(self, forKeyPath: "title", options: .new, context: nil)
+        webView.addObserver(self, forKeyPath: "estimatedProgress", options: .new, context: nil)
+
+        
 
     }
     
@@ -62,6 +67,8 @@ class WebViewController: NSViewController {
         
         if webView != nil {
             webView.removeObserver(self, forKeyPath: "title")
+            webView.removeObserver(self, forKeyPath: "estimatedProgress")
+
         }
     }
 }
@@ -71,9 +78,13 @@ extension WebViewController {
 
     override  func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         
-        if keyPath == "title" , object is WKWebView , let title = (object as! WKWebView).title {
+        if keyPath == "title" , let title = webView?.title {
             if delegate != nil {
                 delegate?.controller(self, didChangeTitle: title )
+            }
+        }else if keyPath == "estimatedProgress",let estimatedProgress = webView?.estimatedProgress {
+            if delegate != nil {
+                delegate?.controller(self, updateProgress: estimatedProgress)
             }
         }
         else {
