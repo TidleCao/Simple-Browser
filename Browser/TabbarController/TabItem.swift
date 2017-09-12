@@ -20,6 +20,7 @@ fileprivate let spaceSize: CGFloat = 3.0
 protocol TabItemDelegate {
     func onCloseTabItem(_ sender: TabItem)
     func onTabSelect(_ item: TabItem)
+    func onTabHover(_ item: TabItem)
 }
 
 class TabItem: NSView {
@@ -163,6 +164,7 @@ class TabItem: NSView {
     override func mouseEntered(with event: NSEvent) {
         self.layer?.backgroundColor = backgroundHoverColor.cgColor
         self.needsDisplay = true
+        delegate?.onTabHover(self)
 
     }
     

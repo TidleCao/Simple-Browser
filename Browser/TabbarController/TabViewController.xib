@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12121" systemVersion="16G23a" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12121" systemVersion="16G29" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12121"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -19,11 +19,19 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="WAS-4w-XUu" customClass="TabView" customModule="Browser" customModuleProvider="target">
-                    <rect key="frame" x="2" y="292" width="573" height="35"/>
+                    <rect key="frame" x="0.0" y="292" width="574" height="35"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                    <gestureRecognizers>
+                        <panGestureRecognizer delaysPrimaryMouseButtonEvents="YES" id="Lr5-sX-Vwo">
+                            <connections>
+                                <action selector="panGestureUpdated:" target="-2" id="iSp-TF-uCK"/>
+                                <outlet property="delegate" destination="-2" id="wKD-OO-2ZQ"/>
+                            </connections>
+                        </panGestureRecognizer>
+                    </gestureRecognizers>
                 </customView>
                 <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="SNu-bb-XTP">
-                    <rect key="frame" x="0.0" y="0.0" width="575" height="290"/>
+                    <rect key="frame" x="0.0" y="0.0" width="575" height="293"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 </customView>
             </subviews>

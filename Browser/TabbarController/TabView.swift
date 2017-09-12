@@ -16,4 +16,10 @@ class TabView: NSView {
         // Drawing code here.
     }
     
+    override var mouseDownCanMoveWindow: Bool {
+        return false
+    }
+    
+    
+
 }

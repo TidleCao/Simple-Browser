@@ -150,6 +150,8 @@ extension ViewController: TabViewDelegate {
             //update searching field
             if let url  = vc.webView.url?.absoluteString {
                 self.searchField.stringValue = url
+            }else {
+                self.searchField.stringValue = ""
             }
             
 

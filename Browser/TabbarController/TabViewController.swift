@@ -14,7 +14,7 @@ fileprivate let tabItemWidthMin: CGFloat = 50
 
 fileprivate let tabItemHeight: CGFloat = 50
 
-fileprivate let tabItemSpace: CGFloat = 5
+fileprivate let tabItemSpace: CGFloat = 2
 
 fileprivate let addItemSpaceWidth: CGFloat = 80
 
@@ -25,7 +25,7 @@ protocol TabViewDelegate {
 
 }
 
-class TabViewController: NSViewController {
+class TabViewController: NSViewController, NSGestureRecognizerDelegate {
     
     var selectedItem: TabItem?
     var delegate: TabViewDelegate?
@@ -45,7 +45,7 @@ class TabViewController: NSViewController {
         }
     }
     
-    @IBOutlet weak var tabView: NSView! {
+    @IBOutlet weak var tabView: TabView! {
         didSet {
             tabView.wantsLayer = true
             tabView.layer?.backgroundColor = NSColor.white.cgColor
@@ -61,17 +61,6 @@ class TabViewController: NSViewController {
             return tabItemWidthMax
         }
         return width
-    }
-    
-    fileprivate func drawTab() {
-        
-        var startx: CGFloat = 10.0
-        let width = tabItemWidth
-        
-        for item in tabViewItems {
-            item.frame = NSMakeRect(startx, 0, width, item.frame.size.height)
-            startx += tabItemSpace + width
-        }
     }
     
     func select(for item: TabItem) {
@@ -104,7 +93,58 @@ class TabViewController: NSViewController {
         // Do view setup here.
     }
     
+    fileprivate func drawTab() {
+        
+        var startx: CGFloat = 10.0
+        let width = tabItemWidth
+        
+        for item in tabViewItems {
+            item.frame = NSMakeRect(startx, 0, width, item.frame.size.height)
+            startx += tabItemSpace + width
+        }
+    }
+    
+    private func tabItem(at location: NSPoint) -> TabItem? {
+        for item in tabViewItems {
+            if NSPointInRect(location, item.frame) { return item }
+        }
+        return nil
+    }
+    
+    var dragedTabItem: TabItem?
+    private var dragedXOffset: CGFloat = 0
+    
+    @IBAction func panGestureUpdated(_ recognizer: NSPanGestureRecognizer) {
+        switch recognizer.state {
+        case .began:
+            let dragedStartPosition =  recognizer.location(in: self.tabView)
+            dragedTabItem = tabItem(at: dragedStartPosition)
+            if dragedTabItem != nil {
+                dragedXOffset =  dragedStartPosition.x - dragedTabItem!.frame.origin.x
+            }
+
+        case .changed:
+            guard dragedTabItem != nil  else {
+                return
+            }
+            let location =  recognizer.location(in: self.tabView)
+            dragedTabItem!.frame.origin.x = location.x - dragedXOffset
+            
+        case .ended:
+            dragedTabItem = nil
+            dragedXOffset = 0
+            drawTab()
+        default:
+            break
+        }
+    }
+    
+    func gestureRecognizerShouldBegin(_ gestureRecognizer: NSGestureRecognizer) -> Bool {
+        return true
+    }
+
 }
+
 
 // MARK:-
 extension TabViewController {
@@ -163,5 +203,22 @@ extension TabViewController: TabItemDelegate {
     
     func onTabSelect(_ item: TabItem) {
         self.select(for: item)
+    }
+    
+    func onTabHover(_ item: TabItem) {
+        
+        guard let dragedItem = self.dragedTabItem else {
+            return
+        }
+        
+        // exchange dragedItem and hoverItem
+        if let hoverIndex = self.tabViewItems.index(of: item),
+            let dragedIndex = self.tabViewItems.index(of: dragedItem) {
+            self.tabViewItems.remove(at: dragedIndex)
+            self.tabViewItems.insert(dragedItem, at: hoverIndex)
+
+            self.drawTab()
+        }
+
     }
 }
